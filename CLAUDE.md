@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SwiftShare: Android P2P file-sharing app (BLE/UWB/Wi-Fi Aware/Wi-Fi Direct), zero backend. Full requirements live in `BRDs/00-overview.md` and `BRDs/01` through `BRDs/07` (one doc per module). Read the relevant BRD doc before touching a module — each has functional requirements (FR-XX.Y), non-functional requirements (NFR-XX.Y), and acceptance criteria that define correctness, not just the code.
 
-Repo is a Gradle multi-module Android project, currently at the **architectural scaffold stage**: interfaces and module wiring exist, feature implementations do not yet.
+Repo is a Gradle multi-module Android project, at the **architectural scaffold stage**: module wiring and interfaces exist across the board; `core-transfer` has its first real implementation (`DefaultTransferEngine`, `ChunkFraming`, `ChunkIo`, `ResumeStore`, `RoundRobinChunkScheduler`, with unit tests) — other core modules are still interface-only.
 
 ## Build commands
 
@@ -46,12 +46,12 @@ Six Gradle modules, one per BRD module, with a **strict one-directional dependen
 
 `BRDs/07-future-roadmap-sidelink.md` (5G NR Sidelink) is doc-only, no code. The `Transport`/`TransportKind` interface in `core-transport` is intentionally shaped so a `SidelinkTransport` can be added later without touching `core-transfer`'s chunking/bonding logic — preserve that when adding transports.
 
-### Module responsibilities (interfaces currently defined, no implementations yet)
+### Module responsibilities
 
-- **`core-security`**: `PairingManager`, `SessionCrypto`, `KeyStore`. `RotatingDeviceId` value class — never pass a persistent hardware identifier (IMEI/MAC) anywhere in discovery or negotiation payloads (FR-05.4).
-- **`core-discovery`**: `DeviceScanner`, `DeviceAdvertiser`, `DiscoveredDevice`/`DeviceCapabilities`/`RangingInfo`.
-- **`core-transport`**: `Transport`, `TransportHandle`, `TransportManager`, `NegotiationResult`/`NegotiationState`. Priority order for transport selection is Wi-Fi Aware → Wi-Fi Direct → BLE-only (FR-02.2) — Wi-Fi Aware fragmentation across chipsets is real even on API 29+ devices, so don't assume availability without runtime feature detection.
-- **`core-transfer`**: `TransferEngine`, `ChunkScheduler`, `TransferJob` (default chunk size 4MB per FR-03.1), `TransferProgress`, `ChunkResult`.
+- **`core-security`** (interfaces only): `PairingManager`, `SessionCrypto`, `KeyStore`. `RotatingDeviceId` value class — never pass a persistent hardware identifier (IMEI/MAC) anywhere in discovery or negotiation payloads (FR-05.4).
+- **`core-discovery`** (interfaces only): `DeviceScanner`, `DeviceAdvertiser`, `DiscoveredDevice`/`DeviceCapabilities`/`RangingInfo`.
+- **`core-transport`** (interfaces only): `Transport`, `TransportHandle`, `TransportManager`, `NegotiationResult`/`NegotiationState`. Priority order for transport selection is Wi-Fi Aware → Wi-Fi Direct → BLE-only (FR-02.2) — Wi-Fi Aware fragmentation across chipsets is real even on API 29+ devices, so don't assume availability without runtime feature detection.
+- **`core-transfer`** (implemented): `TransferEngine`/`DefaultTransferEngine`, `ChunkScheduler`/`RoundRobinChunkScheduler`, `TransferJob` (default chunk size 4MB per FR-03.1), `TransferProgress`, `ChunkResult`, plus `ChunkFraming`, `ChunkIo`, `ResumeStore` for on-wire framing and resume state. Has unit tests under `core-transfer/src/test`.
 - **`core-compression`**: `CompressionStrategy` + `NoOpCompressionStrategy` default. Compression must stay lossless (FR-04.4) and skip already-compressed formats (FR-04.2) — detect by magic bytes, not file extension (FR-04.1).
 - **`app`**: Compose UI shell, share-sheet integration, owns no transport/security logic itself — consumes state from the other modules (BRD 06).
 
