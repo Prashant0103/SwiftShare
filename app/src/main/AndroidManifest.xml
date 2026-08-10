@@ -14,6 +14,14 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Wi-Fi Direct: WifiP2pManager's connect/createGroup require CHANGE_WIFI_STATE, and any
+         java.net.Socket needs INTERNET even for a purely local P2P link. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature android:name="android.hardware.wifi.direct" android:required="true" />
+
     <application
         android:allowBackup="false"
         android:label="SwiftShare"

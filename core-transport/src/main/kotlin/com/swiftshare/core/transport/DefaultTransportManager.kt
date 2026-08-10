@@ -21,7 +21,9 @@ import kotlinx.coroutines.withTimeout
 class DefaultTransportManager(
     private val transports: List<Transport>,
     private val bondingThresholdBytes: Long = 100L * 1024 * 1024,
-    private val connectTimeoutMs: Long = 5_000,
+    // Wi-Fi Direct peer discovery + group formation realistically takes 5-15s on real hardware;
+    // the old 5s budget timed out every Direct attempt before the group ever formed.
+    private val connectTimeoutMs: Long = 25_000,
 ) : TransportManager {
 
     private val _state = MutableStateFlow(NegotiationState.CONNECTING)

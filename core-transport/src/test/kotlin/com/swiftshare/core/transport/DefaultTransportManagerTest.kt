@@ -28,6 +28,7 @@ private fun peer(aware: Boolean, direct: Boolean) = DiscoveredDevice(
     capabilities = DeviceCapabilities("v1", supportsWifiAware = aware, supportsWifiDirect = direct, supportsUwb = false),
     rssi = -50,
     rangingInfo = null,
+    publicKey = ByteArray(0),
 )
 
 class DefaultTransportManagerTest {

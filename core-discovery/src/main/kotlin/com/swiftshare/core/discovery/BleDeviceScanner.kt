@@ -59,7 +59,10 @@ class BleDeviceScanner(context: Context) : DeviceScanner {
         activeCallback = callback
 
         val filter = ScanFilter.Builder().setServiceUuid(ParcelUuid(AdvertisementCodec.SERVICE_UUID)).build()
-        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setLegacy(false) // advertiser sends BLE5 extended sets to fit the pairing public key
+            .build()
         requiringBluetoothPermission("Starting BLE scan") {
             scanner.startScan(listOf(filter), settings, callback)
         }
